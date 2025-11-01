@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>邱鈴雅作品集｜Portfolio of Ling-Ya Chiu</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#ffffff;--accent:#2b6cb0}
+    html,body{height:100%;margin:0;font-family:Arial, "微軟正黑體", sans-serif;background:var(--bg);}
+    header{background:var(--accent);color:white;text-align:center;padding:30px 10px;border-radius:0 0 18px 18px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+    header h1{margin:0;font-size:28px;letter-spacing:1px;}
+    header p{margin:6px 0 0;font-size:16px;opacity:0.9;}
+    .app{display:grid;grid-template-columns:260px 1fr;gap:20px;height:calc(100vh - 120px);padding:18px}
+    .sidebar{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(20,20,50,0.06);overflow:auto}
+    .viewer{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(20,20,50,0.06);display:flex;flex-direction:column}
+    h2{font-size:18px;margin:0 0 12px}
+    .file-list{list-style:none;padding:0;margin:0}
+    .file-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;transition:background 0.2s}
+    .file-item:hover{background:#f0f6ff}
+    .file-item.active{background:linear-gradient(90deg,rgba(43,108,176,0.10),transparent)}
+    .file-thumb{width:48px;height:64px;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666}
+    .meta{font-size:13px}
+    .controls{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .btn{border:0;padding:8px 12px;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer}
+    .btn.secondary{background:#eef3fb;color:var(--accent)}
+    .pdf-frame{flex:1;border:0;width:100%;border-radius:8px;background:#ddd}
+    .footer{font-size:12px;color:#666;margin-top:10px}
+    @media(max-width:800px){.app{grid-template-columns:1fr} .sidebar{order:2;height:180px}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>邱鈴雅作品集</h1>
+    <p>個人履歷</p>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <h2>檔案清單</h2>
+      <ul class="file-list" id="fileList"></ul>
+      <div class="footer">提示：點選檔名即可在右側檢視，或使用「下載」按鈕另存。</div>
+    </aside>
+
+    <main class="viewer">
+      <div class="controls">
+        <button class="btn" id="prevBtn">上一個</button>
+        <button class="btn" id="nextBtn">下一個</button>
+        <div style="flex:1"></div>
+        <a id="downloadLink" class="btn secondary" download>下載目前檔案</a>
+      </div>
+      <iframe id="pdfViewer" class="pdf-frame" title="PDF 檢視器"></iframe>
+    </main>
+  </div>
+
+  <script>
+    const files = [
+      {id:1, name: '作品集-邱鈴雅.pdf', path: '作品集-邱鈴雅.pdf'},
+      {id:2, name: '掃描的文件 3.pdf', path: '掃描的文件 3.pdf'}
+    ];
+
+    const listEl = document.getElementById('fileList');
+    const viewer = document.getElementById('pdfViewer');
+    const downloadLink = document.getElementById('downloadLink');
+    let currentIndex = 0;
+
+    function renderList(){
+      listEl.innerHTML = '';
+      files.forEach((f, i) =>{
+        const li = document.createElement('li');
+        li.className = 'file-item' + (i===currentIndex? ' active':'');
+        li.innerHTML = `
+          <div class="file-thumb">PDF</div>
+          <div>
+            <div class="meta"><strong>${f.name}</strong></div>
+            <div style="font-size:12px;color:#888">檔案 ${i+1} / ${files.length}</div>
+          </div>
+        `;
+        li.addEventListener('click', ()=>{ openFile(i); });
+        listEl.appendChild(li);
+      });
+    }
+
+    function openFile(index){
+      currentIndex = index;
+      const f = files[index];
+      viewer.src = f.path;
+      downloadLink.href = f.path;
+      downloadLink.setAttribute('download', f.name);
+      renderList();
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', ()=>{
+      openFile((currentIndex - 1 + files.length) % files.length);
+    });
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      openFile((currentIndex + 1) % files.length);
+    });
+
+    renderList();
+    openFile(0);
+  </script>
+</body>
+</html>
